@@ -1,6 +1,6 @@
 
 
-# 
+# Retards_SNCF
 
 La motivation de ce projet est la vengeance contre la SNCF qui m'annule mon putain de train sans me prévenir avec leur putain d'application de merde alors que je le mets bien dans "Vos itinérances". Mais la fonction est down depuis 3 mois, là ça marche mais pour une raison inconnue il veut me faire partir à 15h alors qu'il y a un train à 9h40.
 
@@ -10,7 +10,7 @@ pour demander si mon train est annulé, et envoyer la réponse sur mon télépho
 
 Il vous faut un jeton d'accès à l'API SNCF : 
 
-Ils l'envoie par mail quand on leur donne ici : https://numerique.sncf.com/
+Ils l'envoient par mail quand on leur donne ici : https://numerique.sncf.com/
 
 Pour trouver les adresses des gares au format "stop_area" (il y en a besoin ensuite pour chopper les trains), il faut ensuite taper sur :
 
@@ -43,4 +43,9 @@ Ensuite, pour obtenir si mon putain de train est annulé, il faut faire :
 
 https://api.sncf.com/v1/coverage/sncf/stop_areas/stop_area:SNCF:87581009/departures
 
-Et je pense 
+
+...
+9h40 est arrivé, je continuerai ce projet aux prochains retards.
+
+
+Le mot "retard", en anglais, possède un second sens plutôt cohérent avec la motivation du projet, et ça n'est pas un hasard.
