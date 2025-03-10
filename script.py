@@ -23,9 +23,10 @@ SNCF_API_KEY = os.getenv("SNCF_API_KEY")
 DEPARTURE_STATION_CODE = os.getenv("DEPARTURE_STATION_CODE")     # Ex: stop_area:SNCF:87271007 (Bordeaux)
 INTERMEDIATE_STATION_CODE = os.getenv("INTERMEDIATE_STATION_CODE") # Ex: stop_area:SNCF:87584102 (Saint-Émilion)
 TRAIN_TIME = "08:40"  # Heure du train à surveiller
-TRAIN_NUMBER = os.getenv("TRAIN_NUMBER", "")  # Si connu, numéro du train (ex: 864351)
 LINE_CODE = os.getenv("LINE_CODE", "")  # Si connu, code de la ligne (ex: line:SNCF:TER-33:)
 
+
+print("TELEGRAM_BOT_TOKEN : ", SNCF_API_KEY)
 # URL de base de l'API SNCF
 SNCF_API_BASE_URL = "https://api.sncf.com/v1/coverage/sncf/"
 
@@ -58,7 +59,7 @@ def format_time(timestamp):
     except:
         return "??:??"
 
-def find_journey_details(departure_datetime, train_id=None):
+def find_journey_details(departure_datetime):
     """
     Recherche les détails d'un parcours spécifique
     Utilise l'API journeys pour trouver un train passant par l'arrêt intermédiaire
@@ -74,7 +75,7 @@ def find_journey_details(departure_datetime, train_id=None):
         "datetime": formatted_datetime,
         "datetime_represents": "departure",
         "data_freshness": "realtime",
-        "count": 3,  # Nombre de résultats à récupérer
+        "count": 4,  # Nombre de résultats à récupérer
         "disable_geojson": True
     }
     
@@ -91,6 +92,9 @@ def find_journey_details(departure_datetime, train_id=None):
             return None
         
         journeys = response.json().get('journeys', [])
+
+        print("journeys")
+        print(journeys)
         
         if not journeys:
             logger.warning(f"Aucun trajet trouvé pour {formatted_datetime}")
@@ -107,16 +111,19 @@ def find_journey_details(departure_datetime, train_id=None):
                     # Vérifier l'heure de départ
                     departure_dt = section.get('departure_date_time', '')
                     departure_time = format_time(departure_dt)
+
+                    print("is public transport")
+                    print(section)
                     
                     # Vérifier le numéro de train si fourni
                     display_info = section.get('display_informations', {})
                     headsign = display_info.get('headsign', '')
+
+                    print("departure_time")
+                    print(departure_time)
                     
                     if departure_time == TRAIN_TIME:
-                        if train_id and train_id in headsign:
-                            return section
-                        elif not train_id:
-                            return section
+                        return section
         
         # Si on n'a pas trouvé de correspondance exacte, prendre le premier résultat
         if journeys and not target_journey:
@@ -144,9 +151,11 @@ def check_train_status():
         target_datetime = datetime.datetime(
             today.year, today.month, today.day, hour, minute
         )
+
+        print("target_datetime ", target_datetime)
         
         # Trouver le trajet correspondant
-        journey_section = find_journey_details(target_datetime, TRAIN_NUMBER)
+        journey_section = find_journey_details(target_datetime)
         
         if not journey_section:
             msg = f"❓ Impossible de trouver des informations sur le train de {TRAIN_TIME}"
@@ -163,6 +172,11 @@ def check_train_status():
         # Horaires prévus et réels
         base_departure = journey_section.get('base_departure_date_time', '')
         departure = journey_section.get('departure_date_time', '')
+
+        print("departure")
+        print(departure)
+        print("journey_section")
+        print(journey_section)
         
         # Information sur les perturbations
         disruptions = journey_section.get('display_informations', {}).get('links', [])
